@@ -1,0 +1,7 @@
+**/output
+**/*.tar.gz
+**/*.bckp
+**/__pycache__/
+**/cursor.py
+**/secret.py
+**/ethereum_transactions/
