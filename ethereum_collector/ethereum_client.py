@@ -28,7 +28,7 @@ def retrieve_block_transactions(block_number):
         block = w3.eth.get_block(block_number)
     except:
         logging.error(f'retrieving block {block_number} : {traceback.print_exc()}')
-        return(transac_list, 9999)
+        return(transac_list, 999) #TO CHECK
     #retrieve block date
     ts = block.timestamp
     dt = datetime.fromtimestamp(ts).date()

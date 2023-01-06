@@ -3,4 +3,4 @@ client_port = ""
 
 data_dir = "./ethereum_transactions"
 
-number_of_blocks_in_batch = 20
+number_of_blocks_in_batch = 2
