@@ -1,9 +1,11 @@
 import pandas as pd
 import logging
 from log import *
+import traceback
+import csv
 
 col_to_use = ["from", "to", "value", "type", "blockTimestamp"]
-all_transactions = pd.read_parquet('../ethereum_collector/ethereum_transactions/2022-07-04', engine='pyarrow', columns=col_to_use)
+all_transactions = pd.read_parquet('../ethereum_collector/ethereum_transactions/', engine='pyarrow', columns=col_to_use)
 
 """
 all_transactions = pd.DataFrame({
@@ -26,26 +28,29 @@ all_transactions['type'] = all_transactions['type'].astype('string')
 #agg = all_transactions.groupby(['blockTimestamp']).sum()
 # group by must be done before resampling
 
-def aggregator(df, grouping_field):
+def agg_resample(df, grouping_field):
     agg_df = all_transactions.groupby(grouping_field) \
             .resample("1H", on="blockTimestamp") \
             .agg({'value':['sum'],'from':['count', 'nunique']})
     return(agg_df)
 
-def write_to_csv(agg_df, df_name):
+def agg(df, grouping_field):
+    agg_df = all_transactions.groupby(grouping_field) \
+            .agg({'value':['sum'],'from':['count', 'nunique']})
+    return(agg_df)
+def write_to_file(agg_df, df_name):
     agg_df.reset_index(inplace=True) # all columns names at same level
-
     agg_df.columns = [' '.join(col).strip() for col in agg_df.columns.values]
     #print(agg_df)
     try:
-        agg_df.to_csv(f'{df_name}.csv', index=False)
+        agg_df.to_parquet(f'{df_name}.parquet', index=False)
     except:
-        logging.error(f'writing CSV file {df_name}.csv : {traceback.print_exc()}')
+        logging.error(f'writing CSV file {df_name}.parquet : {traceback.print_exc()}')
 
-by_from = aggregator(all_transactions, 'from')
-write_to_csv(by_from, 'by_from')
-by_type = aggregator(all_transactions, 'type')
-write_to_csv(by_type, 'by_type')
+by_type = agg_resample(all_transactions, 'type')
+write_to_file(by_type, 'by_type_hour')
+by_from = agg(all_transactions, 'from')
+write_to_file(by_from, 'by_from')
 
 # number of transactions
 #print(len(all_transactions.index))

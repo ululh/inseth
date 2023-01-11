@@ -1,6 +1,7 @@
 **/output
 **/*.tar.gz
 **/*.csv
+**/*.parquet
 **/*.bckp
 **/__pycache__/
 **/cursor.py
