@@ -1,15 +1,20 @@
+import sys
+sys.path.append("../utils/")
 from config import client_url, client_port, number_of_blocks_in_batch, \
     data_dir
-from cursor import latest_block
+from collector_cursor import latest_block
 from secret import alchemy_api_key
 from web3 import Web3
 from datetime import datetime
-import logging
+from container import *
 from log import *
 import traceback
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pyarrow.dataset as ds
+
+logging_config()
+data_prefix = storage_prefix()
 
 def get_ethereum_client_url():
     if "alchemy.com" in client_url:
@@ -145,28 +150,28 @@ from {first_block_in_batch}')
         missed_transac_in_batch += number_of_errors
         transactions.extend(new_transactions)
 
-    if missed_transac_in_batch > 20: # no writing, no cursor update
+    if missed_transac_in_batch > 20: # no writing, no collector_cursor update
         logging.warning(f'{missed_transac_in_batch} missed transactions for \
 batch of {number_of_blocks_in_batch} blocks starting at {first_block_in_batch}')
         continue
 
     transac_table = build_pyarrow_table(transactions, first_block_in_batch, number_of_blocks_in_batch)
-    write_parquet(transac_table, data_dir, first_block_in_batch, number_of_blocks_in_batch)
-    logging.info(f'wrrote parquet file from {first_block_in_batch}, \
+    write_parquet(transac_table, f'{data_prefix}/{data_dir}', first_block_in_batch, number_of_blocks_in_batch)
+    logging.info(f'wrote parquet file from {first_block_in_batch}, \
 batch of {number_of_blocks_in_batch} blocks')
     latest_block = block_number
 
 
-    # update cursor.py
+    # update collector_cursor.py
     try:
-        with open('cursor.py','r') as file:
+        with open(f'collector_cursor.py','r') as file:
             filedata = file.read()
             filedata = filedata.replace(f'latest_block = {first_block_in_batch-1}',
             f'latest_block = {latest_block}')
-        with open('cursor.py','w') as file:
+        with open(f'collector_cursor.py','w') as file:
             file.write(filedata)
     except:
-        logging.critical(f'unable to update cursor.py file with {latest_block} \
+        logging.critical(f'unable to update collector_cursor.py file with {latest_block} \
 : {traceback.print_exc()}')
         exit()
-    logging.info(f'updated cursor.py to latest_block {latest_block}')
+    logging.info(f'updated collector_cursor.py to latest_block {latest_block}')
