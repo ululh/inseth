@@ -7,7 +7,7 @@ App overview :
   - checks that all blocks are present
   - asynchronously concatenate parquet files (for complete days, with Dask to avoid small row groups)
 - For each graph
-  - create aggregated dataset (aggregator to be implemented)
+  - create aggregated dataset 
   - plot with Dash (viz)
 
 ![Inseth overview](https://github.com/ululh/inseth/blob/main/inseth.excalidraw.png?raw=true)
