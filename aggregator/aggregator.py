@@ -1,8 +1,12 @@
+import sys
+sys.path.append("../utils/")
 import pandas as pd
-import logging
-from log import *
+from log import * # from utils
+from container import * # from utils
 import traceback
-import csv
+
+logging_config()
+data_prefix = storage_prefix()
 
 col_to_use = ["from", "to", "value", "type", "blockTimestamp"]
 all_transactions = pd.read_parquet('../ethereum_collector/ethereum_transactions/', engine='pyarrow', columns=col_to_use)
@@ -45,7 +49,7 @@ def write_to_file(agg_df, df_name):
     try:
         agg_df.to_parquet(f'{df_name}.parquet', index=False)
     except:
-        logging.error(f'writing CSV file {df_name}.parquet : {traceback.print_exc()}')
+        logging.error(f'writing file {df_name}.parquet : {traceback.print_exc()}')
 
 by_type = agg_resample(all_transactions, 'type')
 write_to_file(by_type, 'by_type_hour')
