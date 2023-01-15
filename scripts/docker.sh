@@ -43,7 +43,12 @@ run () {
 		docker rm --force $CONTAINER_ID
 	fi
 	echo "Starting $1...."
-	docker run -d -v inseth:/data --name $1 ${1}_img
+	if [ $1 == 'inseth_viz' ]
+	then
+		docker run -d -v inseth:/data -p 8050:8050 --name $1 ${1}_img
+	else
+		docker run -d -v inseth:/data --name $1 ${1}_img
+	fi
 }
 
 

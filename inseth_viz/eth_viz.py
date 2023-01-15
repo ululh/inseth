@@ -1,19 +1,26 @@
 # Run this app with `python app.py` and
 # visit http://127.0.0.1:8050/ in your web browser.
 
+import sys
+sys.path.append("../utils/")
 import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc
 import plotly.express as px
 import pandas as pd
+from log import * # from utils
+from container import * # from utils
+
+logging_config()
+data_prefix = storage_prefix()
 
 #app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 app = Dash(__name__)
 
-by_type = pd.read_parquet('../aggregator/by_type_hour.parquet', engine='pyarrow')
-by_from = pd.read_parquet('../aggregator/by_from.parquet', engine='pyarrow').sort_values('from count', ascending=False).head(50)
+by_type = pd.read_parquet(f'{data_prefix}/agg/by_type_hour.parquet', engine='pyarrow')
+by_from = pd.read_parquet(f'{data_prefix}/agg/by_from.parquet', engine='pyarrow').sort_values('from count', ascending=False).head(50)
 
-print(by_type.info())
-print(by_from.info())
+#print(by_type.info())
+#print(by_from.info())
 
 #print(all_transactions.shape)
 # sum of values
@@ -53,5 +60,5 @@ app.layout = html.Div(children=[
 ])
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(host='0.0.0.0', debug=True)
 
