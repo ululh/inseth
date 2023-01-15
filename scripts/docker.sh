@@ -5,24 +5,28 @@ then
 	exit 1
 fi
 
+	
 # start daemon if not running
-if ! ps -ef | grep dockerd | grep -v grep >/dev/null
-then
-	echo "Starting dockerd"
-	nohup dockerd > /dev/null 2>&1 &
-	sleep 5
-fi
+start_docker_daemon () {
+	if ! ps -ef | grep dockerd | grep -v grep >/dev/null
+	then
+		echo "Starting dockerd"
+		nohup dockerd > /dev/null 2>&1 &
+		sleep 5
+	fi
+}
 
 # create volume if not existing
-VOLUME=inseth
-if ! docker volume list | grep inseth >/dev/null
-then
-	echo "Creating volume $VOLUME"
-	docker volume create $VOLUME
-fi
+create_vol () {
+	VOLUME=inseth
+	if ! docker volume list | grep inseth >/dev/null
+	then
+		echo "Creating volume $VOLUME"
+		docker volume create $VOLUME
+	fi
+}
 
 # build and run containers
-
 build () {
 
 	# SUDO_USER OK after sudo su but not sudo su -, where is RUID ??
@@ -42,9 +46,46 @@ run () {
 	docker run -d -v inseth:/data --name $1 ${1}_img
 }
 
-build ethereum_collector
-run ethereum_collector
 
+while getopts "svb:r:" OPTION; do
+	case $OPTION in
+	s)
+		start_docker_daemon
+        	;;
+	v)
+		create_vol
+		;;
+	b)
+		case $OPTARG in
+		c)
+			build ethereum_collector
+			run ethereum_collector
+			;;
+		a)
+			build aggregator
+			run aggregator
+			;;
+		v)
+			build inseth_viz
+			run inseth_viz
+			;;
+		esac
+		;;
+	r)
+		case $OPTARG in
+		c)
+			run ethereum_collector
+			;;
+		a)
+			run aggregator
+			;;
+		v)
+			run inseth_viz
+			;;
+		esac
+		;;
+	esac
+done
 # troubleshoot
 # docker run -it --entrypoint bash eth_client_img
 # docker image history --no-trunc eth_client_img > image_history

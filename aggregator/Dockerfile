@@ -1,6 +1,6 @@
 # first stage
 FROM python:3.10 AS builder
-COPY requirements.txt .
+COPY aggregator/requirements.txt .
 
 # install dependencies to the local user directory (eg. /root/.local)
 RUN pip install --user -r requirements.txt
@@ -11,12 +11,13 @@ WORKDIR /code
 
 # copy only the dependencies installation from the 1st stage image
 COPY --from=builder /root/.local /root/.local
-COPY aggregator.py .
-COPY log.py .
+COPY aggregator/aggregator.py aggregator/aggregator.py 
+COPY utils/ ./utils/
 
 # update PATH environment variable
 ENV PATH=/root/.local:$PATH
 
 ENV IN_CONTAINER True
 
-CMD [ "python", "./aggregator.py" ] 
+WORKDIR /code/aggregator
+CMD [ "python", "aggregator.py" ] 

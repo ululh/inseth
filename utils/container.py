@@ -4,6 +4,6 @@ def storage_prefix():
     if in_container:
         return('/data')
     else:
-        return('.')
+        return('/home/ulul/inseth')
 
 
