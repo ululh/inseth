@@ -1,0 +1,31 @@
+Configure github ssh private key in local git
+Create ~/.ssh/config file (then chmod 600), content :
+Host github.com
+ HostName github.com
+ IdentityFile ~/.ssh/keys/github
+
+Done once
+    git config --global user.email ulul@ulul.org
+    git config --global user.name ululh
+
+Add key to ssh-agent
+    eval "$(ssh-agent -s)"
+    ssh-add ~/.ssh/keys/github
+
+Done for each repo (in the local dir)
+    git init
+    git add .
+    git remote add automationOrigin https://github.com/ululh/automation.git OR git remote add origin git@github.com:ululh/seo_monitor.git
+
+Commit
+    git add .
+    git commit -am "comment"
+    git branch -M main
+    git push -u automationOrigin main
+
+Find lost files content : 
+ls -1 | grep -v info | grep -v pack | while read dir; do ls -1 $dir | while read file; do echo ${dir}${file} && git show ${dir}${file}; done; done > /tmp/output
+
+If repo created in github after local commit (if no conflicts) :
+    git pull --allow-unrelated-histories origin main
+    git push -u origin main

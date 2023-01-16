@@ -1,5 +1,6 @@
 **/output
 **/*.tar.gz
+**/*.tar
 **/*.csv
 **/*.parquet
 **/*.bckp

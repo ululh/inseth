@@ -11,7 +11,8 @@ start_docker_daemon () {
 	if ! ps -ef | grep dockerd | grep -v grep >/dev/null
 	then
 		echo "Starting dockerd"
-		nohup dockerd > /dev/null 2>&1 &
+		#nohup dockerd > /dev/null 2>&1 &
+		service docker start
 		sleep 5
 	fi
 }
@@ -94,3 +95,10 @@ done
 # troubleshoot
 # docker run -it --entrypoint bash eth_client_img
 # docker image history --no-trunc eth_client_img > image_history
+
+# multi arch builds
+# docker buildx create --name container --driver=docker-container
+# docker buildx build --builder=container --platform linux/arm64,linux/amd64 -f ./ethereum_collector/Dockerfile -t ec_ma_img .
+# docker buildx build --load -f ./ethereum_collector/Dockerfile -t ec_ma_img --builder=container .
+# docker save only dumps an image for local architecture, a registry and a manifest are needed
+# https://stackoverflow.com/questions/73515781/docker-exporting-image-for-multiple-architectures
