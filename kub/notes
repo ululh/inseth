@@ -1,0 +1,9 @@
+# https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+
+# collect ~/.kube/config from cluster
+# scp -i ~/.ssh/keys/rasp_4096 pi@soc010:/tmp/k3s.yaml ~/.kube/config
+# replace 127.0.0.1 by coordinator hostname
+
+
+# https://medium.com/geekculture/deploying-docker-registry-on-kubernetes-3319622b8f32
+# https://www.containiq.com/post/kubernetes-storage-classes
